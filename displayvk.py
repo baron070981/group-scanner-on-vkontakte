@@ -14,7 +14,7 @@ import sys
 
 class MainWindow(tk.Tk):
     
-    def __init__(self, bg = '#000000'):
+    def __init__(self, bg ='#000000'):
         self.appid_list = list()
         self.owner_list = list()
         
