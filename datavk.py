@@ -1,6 +1,10 @@
 import os
 import sys
 import vk_requests
+from pprint import pprint
+
+
+import globalvars
 
 # 7211649
 
@@ -15,7 +19,7 @@ class VkData:
         self.INIT_API = False
         self.GROUP_DATA = False
         self.api = None
-        self.urls = list()
+        self.urls_ids = list() # [[id, url],[id, url]]
         self.cash_id = list()
         
     
@@ -56,12 +60,17 @@ class VkData:
         data = self.api.wall.get(owner_id=self.owner_id, offset = offset, count = count)
         if len(data['items']) > 0:
             self.GROUP_DATA = True
-            self.urls.clear()
+            self.urls_ids.clear()
             for item_data in data['items']:
-                print(item_data)
-                print('\n')
+                if 'attachments' in item_data:
+                    url = item_data['attachments'][0]['photo']['sizes'][-1]['url']
+                    _id = item_data['attachments'][0]['photo']['id']
+                    if _id not in globalvars.cach_ids:
+                        globalvars.cach_ids.append(_id)
+                    self.urls_ids.append(list([_id, url]))
         else:
             self.GROUP_DATA = False
+            return
 
 
 
@@ -82,7 +91,7 @@ if __name__ == '__main__':
     
     
     vk.get_data_from_group()
-    
+    print(vk.urls_ids)
     
     
     

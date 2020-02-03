@@ -4,12 +4,15 @@ from PIL import ImageTk, Image
 import tkinter as tk
 import tkinter.ttk as ttk
 import os
+import os.path
 import requests
 import time
 from tkinter import messagebox
 import re
 import sys
 
+
+import globalvars
 
 
 class MainWindow(tk.Tk):
@@ -97,6 +100,16 @@ class MainWindow(tk.Tk):
             print('save')
         else:
             print('no save')
+    
+    
+    def get_data_from_widget(self):
+        pass
+        
+    
+    def set_default_params(self):
+        if not os.path.isfile(globvars.appdata):
+            return False
+        
 
 
 
