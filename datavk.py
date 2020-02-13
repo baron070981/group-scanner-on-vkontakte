@@ -84,20 +84,7 @@ class VkData:
 
 
 
-if __name__ == '__main__':
-    
-    vk = VkData()
-    print('Start', vk.INIT_APP_DATA, vk.INIT_API)
-    
-    vk.init_app_data('89992948531', 'baron070981', 7211649, -10467310)
-    print('Start', vk.INIT_APP_DATA, vk.INIT_API)
-    
-    vk.init_api()
-    print('Start', vk.INIT_APP_DATA, vk.INIT_API)
-    
-    
-    vk.get_data_from_group()
-    print(vk.urls_ids)
+
     
     
     
