@@ -27,7 +27,10 @@ class VkData:
         self.__login = login
         self.__password = password
         self.app_id = app_id
+        owner_id = int(owner_id)
+        app_id = int(app_id)
         if owner_id == 0:
+            self.INIT_APP_DATA = False
             return
         elif owner_id > 0:
             self.owner_id = -owner_id
@@ -54,6 +57,7 @@ class VkData:
     
     
     def get_data_from_group(self, offset = 0, count =  5):
+        print('Get data from group')
         if self.INIT_API == False:
             self.GROUP_DATA = False
             return
@@ -63,11 +67,13 @@ class VkData:
             self.urls_ids.clear()
             for item_data in data['items']:
                 if 'attachments' in item_data:
-                    url = item_data['attachments'][0]['photo']['sizes'][-1]['url']
-                    _id = item_data['attachments'][0]['photo']['id']
-                    if _id not in globalvars.cach_ids:
-                        globalvars.cach_ids.append(_id)
-                    self.urls_ids.append(list([_id, url]))
+                    url_a = item_data['attachments'][0]
+                    if 'photo' in url_a:
+                        url = url_a['photo']['sizes'][-1]['url']
+                        _id = url_a['photo']['id']
+                        if _id not in globalvars.cach_ids:
+                            globalvars.cach_ids.append(_id)
+                        self.urls_ids.append(list([_id, url]))
         else:
             self.GROUP_DATA = False
             return
