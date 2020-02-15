@@ -19,24 +19,28 @@ DATA_LIST_BOOL = False #
 count_step = 0 # 
 URL = None
 ID = None
+count_img = 0
 
 
 #
 vk = datavk.VkData()
 # создание главного окна приложения
 root = displayvk.MainWindow()
+root.create_text_window(10, 330)
 
 # получение данных для приложения
 def get_data_application():
     global root
+    global ACTION
     # получение данных из виджетов(логин,пароль и т.п.)
     root.get_appdata_from_widgets()
     # создание необходимых файлов и директорий, определение путей до них
     fileprocc.set_paths_data()
     # загрузка списка id из файла
-    fileprocc.get_cach_ids()
+    #fileprocc.get_cach_ids()
     # определение режима исполнения
     root.performance_mode_selection()
+    
 
 
 # 
@@ -53,9 +57,6 @@ def step_to_next(limit_iter, data_list):
 def saving(event):
     global URL
     global ID
-    global ACTION
-    if not ACTION:
-        return
     fileprocc.save_img_and_id(URL, ID)
     
 
@@ -66,13 +67,6 @@ def next_image(event):
     global count_step
     global URL
     global ID
-    global ACTION
-    
-    if ACTION == False:
-        globalvars.manual = False
-        # root.start_btn.grid()
-        # root.subwindow.destroy()
-        return
     
     if DATA_LIST_BOOL == False:    # если можно получить данные из api
         # получение списка url и id
@@ -84,15 +78,16 @@ def next_image(event):
         if count_step >= len(vk.urls_ids):
             count_step = 0
             DATA_LIST_BOOL = False
-            
-        url = vk.urls_ids[count_step][1]
-        _id = vk.urls_ids[count_step][0]
-        count_step += 1
-        URL = url
-        ID = _id
-        img = fileprocc.save_temp_img(url, _id)
-        root.show_photo(img)
-        fileprocc.delete_photo(img)
+        if len(vk.urls_ids) > 0:
+            url = vk.urls_ids[count_step][1]
+            _id = vk.urls_ids[count_step][0]
+            count_step += 1
+            URL = url
+            ID = _id
+            img = fileprocc.save_temp_img(url, _id)
+            root.show_photo(img)
+            fileprocc.delete_photo(img)
+            root.show_text(text1 = 'Show: '+img, text2 = 'Del: '+img)
         
     
 
@@ -100,24 +95,25 @@ def stop_action(event):
     global root
     global vk
     global STOP_SCAN
-    global ACTION
     STOP_SCAN = True
-    ACTION = False
+    globalvars.show_bool = False
     root.start_btn.grid()
     if root.subwindow != None:
         root.subwindow.destroy()
     vk.urls_ids.clear()
     print('Stop scan:', STOP_SCAN)
-    print('Action:', ACTION)
 
 
 def action(event):
+    global vk
     global STOPED
     global STOP_SCAN
-    global ACTION
-    ACTION = True
+    global count_img
+    count_img = 0
+    vk.urls_ids.clear()
     STOP_SCAN = False
     get_data_application()
+    root.performance_show_selection()
     if globalvars.APP_DATA:
         vk.init_app_data(globalvars.login, globalvars.password,
                          globalvars.app_id, globalvars.owner_id)
@@ -129,11 +125,10 @@ def action(event):
         root.start_btn.grid_remove()
         
         if globalvars.manual:
-            if ACTION == True:
-                root.next_btn.bind('<Button 1>', next_image)
-                root.save_btn.bind('<Button 1>', saving)
-            else:
-                messagebox.showinfo('info', 'STOPED')
+            root.next_btn.bind('<Button 1>', next_image)
+            root.bind('<Right>', next_image)
+            root.save_btn.bind('<Button 1>', saving)
+            root.bind('<Return>', saving)
                 
         
         elif globalvars.auto:
@@ -147,7 +142,10 @@ def action(event):
                     root.subwindow.destroy()
                     break
                 
-                vk.get_data_from_group(globalvars.offset, globalvars.count_posts)
+                if not vk.get_data_from_group(globalvars.offset, globalvars.count_posts):
+                    root.start_btn.grid()
+                    root.subwindow.destroy()
+                    break
                 if len(vk.urls_ids) == 0:
                     messagebox.showinfo('info', 'not data vk')
                     root.start_btn.grid()
@@ -173,19 +171,25 @@ def action(event):
                     if STOP_SCAN:
                         break
                         
-                    print(data)
                     url = data[1]
                     _id = data[0]
                     img = fileprocc.save_img_and_id(url, _id)
                     
-                    if img in globalvars.image_cache:
-                        STOPED = True
-                        break
+                    # if _id in globalvars.cach_ids:
+                        # STOPED = True
+                        # break
                         
-                    globalvars.image_cache.append(img)
-                    root.show_photo(img)
-                    if not globalvars.save_img:
-                        fileprocc.delete_photo(img)
+                    if img not in globalvars.image_cache:
+                        count_img += 1
+                        globalvars.image_cache.append(img)
+                        if globalvars.show_bool:
+                            root.show_photo(img)
+                        status_save = str(count_img)+'. '+'Save:'+img
+                        status_del = ''
+                        if not globalvars.save_img:
+                            fileprocc.delete_photo(img)
+                            status_del = 'Delete: '+str(img)
+                        root.show_text(status_save,status_del)
                         
                 globalvars.offset += globalvars.count_posts
 
@@ -212,6 +216,7 @@ if __name__ == '__main__':
     
     
     root.start_btn.bind('<Button 1>', action)
+    root.bind('<Return>', action)
     root.stop_btn.bind('<Button 1>', stop_action)
     
     
