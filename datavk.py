@@ -2,6 +2,7 @@ import os
 import sys
 import vk_requests
 from pprint import pprint
+from tkinter import messagebox
 
 
 import globalvars
@@ -58,14 +59,20 @@ class VkData:
     
     def get_data_from_group(self, offset = 0, count =  5):
         print('Get data from group')
+        print('Show state:', globalvars.show_bool)
         if self.INIT_API == False:
             self.GROUP_DATA = False
-            return
-        data = self.api.wall.get(owner_id=self.owner_id, offset = offset, count = count)
+            return False
+        try:
+            data = self.api.wall.get(owner_id=self.owner_id, offset = offset, count = count)
+        except:
+            messagebox.showerror('Error!', 'Not get data from group!')
+            return False
         if len(data['items']) > 0:
             self.GROUP_DATA = True
             self.urls_ids.clear()
             for item_data in data['items']:
+                
                 if 'attachments' in item_data:
                     url_a = item_data['attachments'][0]
                     if 'photo' in url_a:
@@ -76,7 +83,8 @@ class VkData:
                         self.urls_ids.append(list([_id, url]))
         else:
             self.GROUP_DATA = False
-            return
+            return False
+        return True
 
 
 
