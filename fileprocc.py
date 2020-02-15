@@ -124,11 +124,11 @@ def save_img_and_id(url_img, id_img):
     with open(globalvars.img_path+'/'+str(id_img)+'.jpg', 'wb') as f:
         print('Saving', str(id_img)+'.jpg', 'in', globalvars.img_path)
         f.write(req.content)
-    if str(id_img) not in globalvars.cach_ids:
-        print('Add id', id_img, 'to file')
-        with open(globalvars.path_to_ids+'/'+globalvars.club_ids, 'a') as f:
-            f.write(str(id_img)+'\n')
-    #globalvars.image_cache.append(globalvars.img_path+'/'+str(id_img)+'.jpg')
+    # if str(id_img) not in globalvars.cach_ids:
+        # print('Add id', id_img, 'to file')
+        # with open(globalvars.path_to_ids+'/'+globalvars.club_ids, 'a') as f:
+            # f.write(str(id_img)+'\n')
+    # globalvars.image_cache.append(globalvars.img_path+'/'+str(id_img)+'.jpg')
     return globalvars.img_path+'/'+str(id_img)+'.jpg'
 
 
