@@ -34,6 +34,7 @@ class MainWindow(tk.Tk):
         self.title('Scanning VKontakte')
         
         self.subwindow = None
+        self.textwindow = None
         
         # init widgets
         # login, password, app_id, owner_id, count_posts
@@ -96,14 +97,11 @@ class MainWindow(tk.Tk):
         self.stop_btn.grid(row=1, column=3, pady=5, padx=5, sticky='w'+'s'+'n'+'e')
         
         self.panel = None
-        
-        
-        
-        #self.mode_check.select()
-        
+        self.info_panel1 = None
+        self.info_panel2 = None
 
     
-    # class methods
+# =================  class methods ======================
     
     
     def performance_mode_selection(self):
@@ -111,7 +109,6 @@ class MainWindow(tk.Tk):
         state_mode = self.bool_check_mode.get()
         if state_mode:
             self.bool_check_save.set(0)
-            self.bool_check_show.set(1)
             globalvars.manual = True
             globalvars.auto = False
             globalvars.show_bool = True
@@ -120,12 +117,6 @@ class MainWindow(tk.Tk):
             globalvars.auto = True
             globalvars.manual = False
         
-        state_show = self.bool_check_show.get()
-        if state_show:
-            globalvars.show_bool = True
-        else:
-            globalvars.show_bool = False
-        
         state_save = self.bool_check_save.get()
         if state_save:
             globalvars.save_img = True
@@ -133,7 +124,14 @@ class MainWindow(tk.Tk):
             globalvars.save_img = False
         print('State mode:', state_mode, 'State save:', state_save)
         print('Auto:', globalvars.auto, 'Manual:', globalvars.manual, 'Save:', globalvars.save_img)
-        
+
+
+    def performance_show_selection(self):
+        state_show = self.bool_check_show.get()
+        if state_show:
+            globalvars.show_bool = True
+        else:
+            globalvars.show_bool = False
     
     
     def get_appdata_from_widgets(self):
@@ -184,6 +182,16 @@ class MainWindow(tk.Tk):
         self.subwindow.geometry('+{}+{}'.format(posx, posy))
         self.panel = tk.Label(self.subwindow)
         self.panel.pack()
+        
+    
+    def create_text_window(self, posx = 1, posy = 1):
+        self.textwindow = tk.Toplevel()
+        self.textwindow.title('Status')
+        self.textwindow.geometry('+{}+{}'.format(posx, posy))
+        self.info_panel1 = tk.Text(self.textwindow, bg = '#000031', fg = '#00ff55', width = 37, height = 1, font = 'bold')
+        self.info_panel2 = tk.Text(self.textwindow, bg = '#000031', fg = '#ff3300', width = 37, height = 1, font = 'bold')
+        self.info_panel1.pack()
+        self.info_panel2.pack()
     
     
     def set_image_size(self, width, height, set_size):
@@ -203,6 +211,14 @@ class MainWindow(tk.Tk):
             height = 100
         return int(width), int(height)
     
+    
+    def show_text(self, text1:str, text2:str):
+        self.info_panel1.delete(1.0, tk.END)
+        self.info_panel1.insert(1.0, text1)
+        self.textwindow.update()
+        self.info_panel2.delete(1.0, tk.END)
+        self.info_panel2.insert(1.0, text2)
+        self.textwindow.update()
     
     def show_photo(self, img_path):
         #size_img = (200,200)
